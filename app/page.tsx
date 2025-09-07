@@ -10,11 +10,14 @@ import { CreateProjectModal } from '@/components/CreateProjectModal';
 import { DistributeRevenueModal } from '@/components/DistributeRevenueModal';
 import { PayoutHistory } from '@/components/PayoutHistory';
 import { ContributorRow } from '@/components/ContributorRow';
+import { X402PaymentModal } from '@/components/X402PaymentModal';
+import { X402TestComponent } from '@/components/X402TestComponent';
 import { Button } from '@/components/ui/Button';
 import { Toast } from '@/components/ui/Toast';
 import { Project, Contributor, CreateProjectData, DistributeRevenueData, Payout } from '@/lib/types';
+import { useX402Payment } from '@/lib/hooks/useX402Payment';
 import { generateId } from '@/lib/utils';
-import { Plus, Users, DollarSign, BarChart3, ArrowLeft } from 'lucide-react';
+import { Plus, Users, DollarSign, BarChart3, ArrowLeft, CreditCard } from 'lucide-react';
 
 type View = 'dashboard' | 'project-details' | 'create-project';
 
@@ -26,10 +29,12 @@ interface ToastState {
 
 export default function HomePage() {
   const { setFrameReady } = useMiniKit();
+  const { processPayment, verifyPayment } = useX402Payment();
   const [currentView, setCurrentView] = useState<View>('dashboard');
   const [selectedProject, setSelectedProject] = useState<Project | null>(null);
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [isDistributeModalOpen, setIsDistributeModalOpen] = useState(false);
+  const [isX402PaymentModalOpen, setIsX402PaymentModalOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [toast, setToast] = useState<ToastState>({ isVisible: false, type: 'info', message: '' });
 
@@ -155,35 +160,88 @@ export default function HomePage() {
   const handleDistributeRevenue = async (data: DistributeRevenueData) => {
     setIsLoading(true);
     try {
-      // Simulate blockchain transaction
-      await new Promise(resolve => setTimeout(resolve, 3000));
-      
       const projectContributors = contributors.filter(c => c.projectId === data.projectId);
-      const newPayouts: Payout[] = projectContributors.map(contributor => ({
-        payoutId: generateId(),
-        poolId: generateId(),
-        contributorId: contributor.contributorId,
-        amount: data.amount * (contributor.sharePercentage / 100) * 0.98, // After 2% fee
-        transactionHash: `0x${Math.random().toString(16).substring(2).padStart(64, '0')}`,
-        timestamp: new Date(),
-        status: 'completed',
-      }));
+      const newPayouts: Payout[] = [];
+
+      // Process payments to each contributor using X402
+      for (const contributor of projectContributors) {
+        const payoutAmount = data.amount * (contributor.sharePercentage / 100) * 0.98; // After 2% fee
+        
+        try {
+          const paymentResult = await processPayment({
+            amount: payoutAmount.toString(),
+            token: 'USDC', // Default to USDC for revenue distribution
+            recipient: contributor.walletAddress,
+            description: `Revenue distribution for ${selectedProject?.projectName}`,
+            metadata: {
+              projectId: data.projectId,
+              contributorId: contributor.contributorId,
+              sharePercentage: contributor.sharePercentage,
+              source: data.source,
+            },
+          });
+
+          if (paymentResult.success && paymentResult.transactionHash) {
+            // Verify the payment
+            const isVerified = await verifyPayment(paymentResult.transactionHash);
+            
+            newPayouts.push({
+              payoutId: generateId(),
+              poolId: generateId(),
+              contributorId: contributor.contributorId,
+              amount: payoutAmount,
+              transactionHash: paymentResult.transactionHash,
+              timestamp: new Date(),
+              status: isVerified ? 'completed' : 'pending',
+            });
+          } else {
+            // Handle failed payment
+            newPayouts.push({
+              payoutId: generateId(),
+              poolId: generateId(),
+              contributorId: contributor.contributorId,
+              amount: payoutAmount,
+              transactionHash: '',
+              timestamp: new Date(),
+              status: 'failed',
+            });
+            
+            showToast('error', `Payment failed for ${contributor.name || contributor.walletAddress}: ${paymentResult.error}`);
+          }
+        } catch (error: any) {
+          console.error('Payment processing error:', error);
+          showToast('error', `Payment error for ${contributor.name || contributor.walletAddress}: ${error.message}`);
+        }
+      }
 
       setPayouts(prev => [...prev, ...newPayouts]);
       
       // Update project totals
+      const successfulPayouts = newPayouts.filter(p => p.status === 'completed');
+      const totalDistributed = successfulPayouts.reduce((sum, p) => sum + p.amount, 0);
+      
       setProjects(prev => prev.map(p => 
         p.projectId === data.projectId 
           ? { 
               ...p, 
               totalRevenue: (p.totalRevenue || 0) + data.amount,
-              totalDistributed: (p.totalDistributed || 0) + (data.amount * 0.98)
+              totalDistributed: (p.totalDistributed || 0) + totalDistributed
             }
           : p
       ));
 
       setIsDistributeModalOpen(false);
-      showToast('success', 'Revenue distributed successfully!');
+      
+      const successCount = successfulPayouts.length;
+      const totalCount = projectContributors.length;
+      
+      if (successCount === totalCount) {
+        showToast('success', 'Revenue distributed successfully to all contributors!');
+      } else if (successCount > 0) {
+        showToast('info', `Revenue distributed to ${successCount}/${totalCount} contributors. Check individual payment status.`);
+      } else {
+        showToast('error', 'Failed to distribute revenue to any contributors.');
+      }
     } catch (error) {
       showToast('error', 'Failed to distribute revenue. Please try again.');
     } finally {
@@ -231,13 +289,23 @@ export default function HomePage() {
       <div className="space-y-md">
         <div className="flex items-center justify-between">
           <h2 className="text-xl font-semibold text-textPrimary">My Projects</h2>
-          <Button
-            onClick={() => setIsCreateModalOpen(true)}
-            className="flex items-center space-x-xs"
-          >
-            <Plus className="w-4 h-4" />
-            <span>New Project</span>
-          </Button>
+          <div className="flex items-center space-x-sm">
+            <Button
+              variant="outline"
+              onClick={() => setIsX402PaymentModalOpen(true)}
+              className="flex items-center space-x-xs"
+            >
+              <CreditCard className="w-4 h-4" />
+              <span>X402 Payment</span>
+            </Button>
+            <Button
+              onClick={() => setIsCreateModalOpen(true)}
+              className="flex items-center space-x-xs"
+            >
+              <Plus className="w-4 h-4" />
+              <span>New Project</span>
+            </Button>
+          </div>
         </div>
 
         <div className="space-y-md">
@@ -254,6 +322,9 @@ export default function HomePage() {
           ))}
         </div>
       </div>
+
+      {/* X402 Test Component - for development/testing */}
+      <X402TestComponent />
     </div>
   );
 
@@ -344,6 +415,16 @@ export default function HomePage() {
           isLoading={isLoading}
         />
       )}
+
+      <X402PaymentModal
+        isOpen={isX402PaymentModalOpen}
+        onClose={() => setIsX402PaymentModalOpen(false)}
+        onSuccess={(transactionHash) => {
+          showToast('success', `Payment successful! Transaction: ${transactionHash.slice(0, 10)}...`);
+          setIsX402PaymentModalOpen(false);
+        }}
+        title="X402 Payment"
+      />
 
       <Toast
         type={toast.type}
