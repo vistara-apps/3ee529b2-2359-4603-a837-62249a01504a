@@ -8,13 +8,15 @@ import { FrameContainer } from '@/components/FrameContainer';
 import { ProjectCard } from '@/components/ProjectCard';
 import { CreateProjectModal } from '@/components/CreateProjectModal';
 import { DistributeRevenueModal } from '@/components/DistributeRevenueModal';
+import { X402PaymentModal } from '@/components/X402PaymentModal';
+import { X402TestComponent } from '@/components/X402TestComponent';
 import { PayoutHistory } from '@/components/PayoutHistory';
 import { ContributorRow } from '@/components/ContributorRow';
 import { Button } from '@/components/ui/Button';
 import { Toast } from '@/components/ui/Toast';
 import { Project, Contributor, CreateProjectData, DistributeRevenueData, Payout } from '@/lib/types';
 import { generateId } from '@/lib/utils';
-import { Plus, Users, DollarSign, BarChart3, ArrowLeft } from 'lucide-react';
+import { Plus, Users, DollarSign, BarChart3, ArrowLeft, Zap } from 'lucide-react';
 
 type View = 'dashboard' | 'project-details' | 'create-project';
 
@@ -30,6 +32,7 @@ export default function HomePage() {
   const [selectedProject, setSelectedProject] = useState<Project | null>(null);
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [isDistributeModalOpen, setIsDistributeModalOpen] = useState(false);
+  const [isX402PaymentModalOpen, setIsX402PaymentModalOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [toast, setToast] = useState<ToastState>({ isVisible: false, type: 'info', message: '' });
 
@@ -191,6 +194,42 @@ export default function HomePage() {
     }
   };
 
+  const handleX402PaymentSuccess = async (data: DistributeRevenueData & { transactionHashes: string[] }) => {
+    setIsLoading(true);
+    try {
+      const projectContributors = contributors.filter(c => c.projectId === data.projectId);
+      const newPayouts: Payout[] = projectContributors.map((contributor, index) => ({
+        payoutId: generateId(),
+        poolId: generateId(),
+        contributorId: contributor.contributorId,
+        amount: data.amount * (contributor.sharePercentage / 100) * 0.98, // After 2% fee
+        transactionHash: data.transactionHashes[index] || `0x${Math.random().toString(16).substring(2).padStart(64, '0')}`,
+        timestamp: new Date(),
+        status: 'completed',
+      }));
+
+      setPayouts(prev => [...prev, ...newPayouts]);
+      
+      // Update project totals
+      setProjects(prev => prev.map(p => 
+        p.projectId === data.projectId 
+          ? { 
+              ...p, 
+              totalRevenue: (p.totalRevenue || 0) + data.amount,
+              totalDistributed: (p.totalDistributed || 0) + (data.amount * 0.98)
+            }
+          : p
+      ));
+
+      setIsX402PaymentModalOpen(false);
+      showToast('success', 'USDC payments distributed successfully via X402!');
+    } catch (error) {
+      showToast('error', 'Failed to process X402 payments. Please try again.');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   const renderDashboard = () => (
     <div className="space-y-xl py-lg">
       <div className="text-center space-y-md">
@@ -298,13 +337,23 @@ export default function HomePage() {
         <div className="space-y-md">
           <div className="flex items-center justify-between">
             <h3 className="text-lg font-semibold text-textPrimary">Contributors</h3>
-            <Button
-              onClick={() => setIsDistributeModalOpen(true)}
-              className="flex items-center space-x-xs"
-            >
-              <DollarSign className="w-4 h-4" />
-              <span>Distribute Revenue</span>
-            </Button>
+            <div className="flex space-x-sm">
+              <Button
+                variant="outline"
+                onClick={() => setIsDistributeModalOpen(true)}
+                className="flex items-center space-x-xs"
+              >
+                <DollarSign className="w-4 h-4" />
+                <span>Distribute ETH</span>
+              </Button>
+              <Button
+                onClick={() => setIsX402PaymentModalOpen(true)}
+                className="flex items-center space-x-xs bg-blue-600 hover:bg-blue-700"
+              >
+                <Zap className="w-4 h-4" />
+                <span>X402 USDC</span>
+              </Button>
+            </div>
           </div>
 
           <div className="space-y-sm">
@@ -318,6 +367,12 @@ export default function HomePage() {
         </div>
 
         <PayoutHistory payouts={projectPayouts} contributors={projectContributors} />
+        
+        {/* X402 Test Component - for development/testing */}
+        <div className="mt-xl">
+          <h3 className="text-lg font-semibold text-textPrimary mb-md">X402 Payment Testing</h3>
+          <X402TestComponent />
+        </div>
       </div>
     );
   };
@@ -335,14 +390,24 @@ export default function HomePage() {
       />
 
       {selectedProject && (
-        <DistributeRevenueModal
-          isOpen={isDistributeModalOpen}
-          onClose={() => setIsDistributeModalOpen(false)}
-          onSubmit={handleDistributeRevenue}
-          projectId={selectedProject.projectId}
-          contributors={contributors.filter(c => c.projectId === selectedProject.projectId)}
-          isLoading={isLoading}
-        />
+        <>
+          <DistributeRevenueModal
+            isOpen={isDistributeModalOpen}
+            onClose={() => setIsDistributeModalOpen(false)}
+            onSubmit={handleDistributeRevenue}
+            projectId={selectedProject.projectId}
+            contributors={contributors.filter(c => c.projectId === selectedProject.projectId)}
+            isLoading={isLoading}
+          />
+          
+          <X402PaymentModal
+            isOpen={isX402PaymentModalOpen}
+            onClose={() => setIsX402PaymentModalOpen(false)}
+            onSuccess={handleX402PaymentSuccess}
+            projectId={selectedProject.projectId}
+            contributors={contributors.filter(c => c.projectId === selectedProject.projectId)}
+          />
+        </>
       )}
 
       <Toast
