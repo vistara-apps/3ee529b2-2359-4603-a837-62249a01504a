@@ -1,0 +1,90 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+@layer base {
+  * {
+    @apply border-gray-200;
+  }
+  
+  body {
+    @apply bg-background text-textPrimary font-sans;
+    font-feature-settings: "rlig" 1, "calt" 1;
+  }
+}
+
+@layer components {
+  .frame-container {
+    @apply max-w-lg w-full mx-auto px-4 min-h-screen bg-background;
+  }
+  
+  .project-card {
+    @apply bg-surface rounded-lg p-lg shadow-card border border-gray-100 hover:shadow-lg transition-all duration-200;
+  }
+  
+  .project-card.active {
+    @apply border-primary/20 bg-primary/5;
+  }
+  
+  .project-card.inactive {
+    @apply opacity-60;
+  }
+  
+  .contributor-row {
+    @apply flex items-center justify-between p-md bg-surface rounded-md border border-gray-100;
+  }
+  
+  .input-field {
+    @apply w-full px-md py-sm border border-gray-200 rounded-md bg-surface text-textPrimary placeholder-textSecondary focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all duration-200;
+  }
+  
+  .input-field.textarea {
+    @apply min-h-20 resize-none;
+  }
+  
+  .btn {
+    @apply px-lg py-sm rounded-md font-medium transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2;
+  }
+  
+  .btn-primary {
+    @apply bg-primary text-white hover:bg-primary/90 focus:ring-primary/20;
+  }
+  
+  .btn-secondary {
+    @apply bg-secondary text-white hover:bg-secondary/90 focus:ring-secondary/20;
+  }
+  
+  .btn-outline {
+    @apply border border-gray-200 text-textPrimary hover:bg-gray-50 focus:ring-gray-200;
+  }
+  
+  .btn-destructive {
+    @apply bg-red-500 text-white hover:bg-red-600 focus:ring-red-200;
+  }
+  
+  .modal-overlay {
+    @apply fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50;
+  }
+  
+  .modal-content {
+    @apply bg-surface rounded-xl p-xl max-w-md w-full shadow-2xl animate-slide-up;
+  }
+  
+  .toast {
+    @apply fixed top-4 right-4 px-lg py-md rounded-md shadow-lg z-50 animate-fade-in;
+  }
+  
+  .toast.success {
+    @apply bg-green-500 text-white;
+  }
+  
+  .toast.error {
+    @apply bg-red-500 text-white;
+  }
+  
+  .toast.info {
+    @apply bg-blue-500 text-white;
+  }
+}
