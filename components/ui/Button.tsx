@@ -19,9 +19,6 @@ const buttonVariants = cva(
         md: 'px-lg py-sm',
         lg: 'px-xl py-md text-lg',
       },
-      disabled: {
-        true: 'opacity-50 cursor-not-allowed',
-      },
     },
     defaultVariants: {
       variant: 'primary',
@@ -38,7 +35,10 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
   ({ className, variant, size, disabled, ...props }, ref) => {
     return (
       <button
-        className={cn(buttonVariants({ variant, size, disabled, className }))}
+        className={cn(
+          buttonVariants({ variant, size, className }),
+          disabled && 'opacity-50 cursor-not-allowed'
+        )}
         ref={ref}
         disabled={disabled}
         {...props}
