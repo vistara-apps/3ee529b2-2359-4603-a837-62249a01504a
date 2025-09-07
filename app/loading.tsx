@@ -1,21 +1,36 @@
+import { FrameContainer } from '@/components/FrameContainer';
+import { SkeletonCard, SkeletonStats } from '@/components/ui/Skeleton';
+
 export default function Loading() {
   return (
-    <div className="frame-container">
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-pulse space-y-4 w-full max-w-md">
-          <div className="h-8 bg-gray-200 rounded w-3/4 mx-auto"></div>
-          <div className="space-y-3">
-            <div className="h-4 bg-gray-200 rounded"></div>
-            <div className="h-4 bg-gray-200 rounded w-5/6"></div>
-            <div className="h-4 bg-gray-200 rounded w-4/6"></div>
+    <FrameContainer>
+      <div className="space-y-xl py-lg">
+        {/* Header skeleton */}
+        <div className="text-center space-y-md">
+          <div className="h-8 w-48 bg-muted rounded mx-auto animate-pulse"></div>
+          <div className="h-4 w-64 bg-muted rounded mx-auto animate-pulse"></div>
+          
+          {/* Wallet connection skeleton */}
+          <div className="h-10 w-32 bg-muted rounded mx-auto animate-pulse mt-md"></div>
+        </div>
+
+        {/* Stats skeleton */}
+        <SkeletonStats />
+
+        {/* Projects section skeleton */}
+        <div className="space-y-md">
+          <div className="flex items-center justify-between">
+            <div className="h-6 w-32 bg-muted rounded animate-pulse"></div>
+            <div className="h-10 w-28 bg-muted rounded animate-pulse"></div>
           </div>
-          <div className="grid grid-cols-3 gap-4">
-            <div className="h-20 bg-gray-200 rounded"></div>
-            <div className="h-20 bg-gray-200 rounded"></div>
-            <div className="h-20 bg-gray-200 rounded"></div>
+
+          {/* Project cards skeleton */}
+          <div className="space-y-md">
+            <SkeletonCard />
+            <SkeletonCard />
           </div>
         </div>
       </div>
-    </div>
+    </FrameContainer>
   );
 }
