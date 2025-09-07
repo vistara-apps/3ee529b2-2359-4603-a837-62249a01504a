@@ -14,7 +14,7 @@ import { Button } from '@/components/ui/Button';
 import { Toast } from '@/components/ui/Toast';
 import { Project, Contributor, CreateProjectData, DistributeRevenueData, Payout } from '@/lib/types';
 import { generateId } from '@/lib/utils';
-import { Plus, Users, DollarSign, BarChart3, ArrowLeft } from 'lucide-react';
+import { Plus, Users, DollarSign, BarChart3, ArrowLeft, TrendingUp } from 'lucide-react';
 
 type View = 'dashboard' | 'project-details' | 'create-project';
 
@@ -192,66 +192,108 @@ export default function HomePage() {
   };
 
   const renderDashboard = () => (
-    <div className="space-y-xl py-lg">
-      <div className="text-center space-y-md">
-        <h1 className="text-3xl font-bold text-textPrimary">CreatorChain</h1>
-        <p className="text-textSecondary">
-          Transparent revenue sharing for collaborative creators
-        </p>
-        
-        <Wallet>
-          <ConnectWallet>
-            <Name />
-          </ConnectWallet>
-        </Wallet>
-      </div>
-
-      <div className="grid grid-cols-3 gap-md">
-        <div className="text-center p-md bg-surface rounded-lg shadow-card">
-          <DollarSign className="w-8 h-8 text-primary mx-auto mb-sm" />
-          <p className="text-2xl font-bold text-textPrimary">
-            {projects.reduce((sum, p) => sum + (p.totalRevenue || 0), 0).toFixed(2)} ETH
+    <div className="space-y-8 py-6">
+      {/* Header Section */}
+      <div className="text-center space-y-4">
+        <div className="space-y-2">
+          <h1 className="text-4xl font-bold text-gradient">CreatorChain</h1>
+          <p className="text-textSecondary text-lg max-w-md mx-auto">
+            Transparent revenue sharing for collaborative creators
           </p>
-          <p className="text-sm text-textSecondary">Total Revenue</p>
         </div>
         
-        <div className="text-center p-md bg-surface rounded-lg shadow-card">
-          <Users className="w-8 h-8 text-secondary mx-auto mb-sm" />
-          <p className="text-2xl font-bold text-textPrimary">{projects.length}</p>
-          <p className="text-sm text-textSecondary">Active Projects</p>
-        </div>
-        
-        <div className="text-center p-md bg-surface rounded-lg shadow-card">
-          <BarChart3 className="w-8 h-8 text-accent mx-auto mb-sm" />
-          <p className="text-2xl font-bold text-textPrimary">{payouts.length}</p>
-          <p className="text-sm text-textSecondary">Total Payouts</p>
+        <div className="pt-4">
+          <Wallet>
+            <ConnectWallet>
+              <Name />
+            </ConnectWallet>
+          </Wallet>
         </div>
       </div>
 
-      <div className="space-y-md">
-        <div className="flex items-center justify-between">
-          <h2 className="text-xl font-semibold text-textPrimary">My Projects</h2>
+      {/* Stats Grid - Responsive */}
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+        <div className="stats-card text-center">
+          <div className="flex items-center justify-center mb-4">
+            <div className="p-3 bg-primary-100 rounded-xl">
+              <DollarSign className="w-8 h-8 text-primary-600" />
+            </div>
+          </div>
+          <p className="text-3xl font-bold text-textPrimary mb-1">
+            {projects.reduce((sum, p) => sum + (p.totalRevenue || 0), 0).toFixed(3)} ETH
+          </p>
+          <p className="text-sm text-textMuted">Total Revenue</p>
+        </div>
+        
+        <div className="stats-card text-center">
+          <div className="flex items-center justify-center mb-4">
+            <div className="p-3 bg-secondary-100 rounded-xl">
+              <Users className="w-8 h-8 text-secondary-600" />
+            </div>
+          </div>
+          <p className="text-3xl font-bold text-textPrimary mb-1">{projects.length}</p>
+          <p className="text-sm text-textMuted">Active Projects</p>
+        </div>
+        
+        <div className="stats-card text-center sm:col-span-1 col-span-1">
+          <div className="flex items-center justify-center mb-4">
+            <div className="p-3 bg-accent-100 rounded-xl">
+              <BarChart3 className="w-8 h-8 text-accent-600" />
+            </div>
+          </div>
+          <p className="text-3xl font-bold text-textPrimary mb-1">{payouts.length}</p>
+          <p className="text-sm text-textMuted">Total Payouts</p>
+        </div>
+      </div>
+
+      {/* Projects Section */}
+      <div className="space-y-6">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+          <h2 className="text-2xl font-semibold text-textPrimary">My Projects</h2>
           <Button
             onClick={() => setIsCreateModalOpen(true)}
-            className="flex items-center space-x-xs"
+            leftIcon={<Plus className="w-4 h-4" />}
+            className="w-full sm:w-auto"
           >
-            <Plus className="w-4 h-4" />
-            <span>New Project</span>
+            New Project
           </Button>
         </div>
 
-        <div className="space-y-md">
-          {projects.map((project) => (
-            <ProjectCard
-              key={project.projectId}
-              project={project}
-              variant={project.status === 'active' ? 'active' : 'inactive'}
-              onClick={() => {
-                setSelectedProject(project);
-                setCurrentView('project-details');
-              }}
-            />
-          ))}
+        <div className="space-y-4">
+          {projects.length === 0 ? (
+            <div className="text-center py-12 bg-surface rounded-xl border border-border">
+              <div className="p-4 bg-gray-50 rounded-full w-16 h-16 mx-auto mb-4 flex items-center justify-center">
+                <Plus className="w-8 h-8 text-textMuted" />
+              </div>
+              <h3 className="text-lg font-medium text-textPrimary mb-2">No projects yet</h3>
+              <p className="text-textSecondary mb-6 max-w-sm mx-auto">
+                Create your first project to start collaborating and sharing revenue with your team.
+              </p>
+              <Button
+                onClick={() => setIsCreateModalOpen(true)}
+                leftIcon={<Plus className="w-4 h-4" />}
+              >
+                Create Your First Project
+              </Button>
+            </div>
+          ) : (
+            projects.map((project, index) => (
+              <div
+                key={project.projectId}
+                className="animate-slide-up"
+                style={{ animationDelay: `${index * 100}ms` }}
+              >
+                <ProjectCard
+                  project={project}
+                  variant={project.status === 'active' ? 'active' : 'inactive'}
+                  onClick={() => {
+                    setSelectedProject(project);
+                    setCurrentView('project-details');
+                  }}
+                />
+              </div>
+            ))
+          )}
         </div>
       </div>
     </div>
@@ -265,59 +307,107 @@ export default function HomePage() {
       projectContributors.some(c => c.contributorId === p.contributorId)
     );
 
+    const distributionPercentage = selectedProject.totalRevenue 
+      ? ((selectedProject.totalDistributed || 0) / selectedProject.totalRevenue) * 100 
+      : 0;
+
     return (
-      <div className="space-y-xl py-lg">
-        <div className="flex items-center space-x-md">
+      <div className="space-y-8 py-6">
+        {/* Header */}
+        <div className="flex flex-col sm:flex-row sm:items-center gap-4">
           <Button
             variant="outline"
             size="sm"
             onClick={() => setCurrentView('dashboard')}
-            className="flex items-center space-x-xs"
+            leftIcon={<ArrowLeft className="w-4 h-4" />}
+            className="w-fit"
           >
-            <ArrowLeft className="w-4 h-4" />
-            <span>Back</span>
+            Back
           </Button>
-          <h1 className="text-2xl font-bold text-textPrimary">{selectedProject.projectName}</h1>
+          <div className="flex-1">
+            <h1 className="text-3xl font-bold text-textPrimary mb-2">{selectedProject.projectName}</h1>
+            <p className="text-textSecondary">{selectedProject.description}</p>
+          </div>
         </div>
 
-        <div className="grid grid-cols-2 gap-md">
-          <div className="p-md bg-surface rounded-lg shadow-card">
-            <h3 className="text-lg font-semibold text-textPrimary mb-sm">Revenue</h3>
-            <p className="text-2xl font-bold text-primary">
+        {/* Revenue Stats */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+          <div className="stats-card">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-lg font-semibold text-textPrimary">Total Revenue</h3>
+              <div className="p-2 bg-primary-100 rounded-lg">
+                <DollarSign className="w-5 h-5 text-primary-600" />
+              </div>
+            </div>
+            <p className="text-3xl font-bold text-primary-600 mb-2">
               {(selectedProject.totalRevenue || 0).toFixed(3)} ETH
             </p>
+            <p className="text-sm text-textMuted">
+              Generated from project activities
+            </p>
           </div>
-          <div className="p-md bg-surface rounded-lg shadow-card">
-            <h3 className="text-lg font-semibold text-textPrimary mb-sm">Distributed</h3>
-            <p className="text-2xl font-bold text-secondary">
+          
+          <div className="stats-card">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-lg font-semibold text-textPrimary">Distributed</h3>
+              <div className="p-2 bg-secondary-100 rounded-lg">
+                <TrendingUp className="w-5 h-5 text-secondary-600" />
+              </div>
+            </div>
+            <p className="text-3xl font-bold text-secondary-600 mb-2">
               {(selectedProject.totalDistributed || 0).toFixed(3)} ETH
             </p>
+            <div className="flex items-center gap-2">
+              <div className="flex-1 bg-gray-200 rounded-full h-2">
+                <div 
+                  className="bg-gradient-to-r from-secondary-500 to-secondary-600 h-2 rounded-full transition-all duration-500"
+                  style={{ width: `${Math.min(distributionPercentage, 100)}%` }}
+                />
+              </div>
+              <span className="text-sm text-textMuted">{distributionPercentage.toFixed(1)}%</span>
+            </div>
           </div>
         </div>
 
-        <div className="space-y-md">
-          <div className="flex items-center justify-between">
-            <h3 className="text-lg font-semibold text-textPrimary">Contributors</h3>
+        {/* Contributors Section */}
+        <div className="space-y-6">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+            <h3 className="text-xl font-semibold text-textPrimary">Contributors</h3>
             <Button
               onClick={() => setIsDistributeModalOpen(true)}
-              className="flex items-center space-x-xs"
+              leftIcon={<DollarSign className="w-4 h-4" />}
+              className="w-full sm:w-auto"
             >
-              <DollarSign className="w-4 h-4" />
-              <span>Distribute Revenue</span>
+              Distribute Revenue
             </Button>
           </div>
 
-          <div className="space-y-sm">
-            {projectContributors.map((contributor) => (
-              <ContributorRow
-                key={contributor.contributorId}
-                contributor={contributor}
-              />
-            ))}
+          <div className="space-y-3">
+            {projectContributors.length === 0 ? (
+              <div className="text-center py-8 bg-surface rounded-xl border border-border">
+                <div className="p-3 bg-gray-50 rounded-full w-12 h-12 mx-auto mb-3 flex items-center justify-center">
+                  <Users className="w-6 h-6 text-textMuted" />
+                </div>
+                <p className="text-textMuted">No contributors added yet</p>
+              </div>
+            ) : (
+              projectContributors.map((contributor, index) => (
+                <div
+                  key={contributor.contributorId}
+                  className="animate-slide-up"
+                  style={{ animationDelay: `${index * 50}ms` }}
+                >
+                  <ContributorRow contributor={contributor} />
+                </div>
+              ))
+            )}
           </div>
         </div>
 
-        <PayoutHistory payouts={projectPayouts} contributors={projectContributors} />
+        {/* Payout History */}
+        <div className="animate-slide-up" style={{ animationDelay: '200ms' }}>
+          <PayoutHistory payouts={projectPayouts} contributors={projectContributors} />
+        </div>
       </div>
     );
   };
