@@ -1,0 +1,30 @@
+{
+  "accountAssociation": {
+    "header": "",
+    "payload": "",
+    "signature": ""
+  },
+  "frame": {
+    "version": "1",
+    "name": "CreatorChain",
+    "subtitle": "Built with Zara",
+    "description": "CreatorChain is a Base Mini App built with Zara.",
+    "iconUrl": "https://0co.to/images/zara-2.png",
+    "homeUrl": "https://3ee529b223594603a83762249a01504a-kr02.vercel.app",
+    "splashImageUrl": "https://3ee529b223594603a83762249a01504a-kr02.vercel.app/splash.png",
+    "splashBackgroundColor": "#000000",
+    "heroImageUrl": "https://3ee529b223594603a83762249a01504a-kr02.vercel.app/image.png",
+    "tagline": "CreatorChain",
+    "screenshotUrls": [
+      "https://3ee529b223594603a83762249a01504a-kr02.vercel.app/screenshot.png",
+      "https://3ee529b223594603a83762249a01504a-kr02.vercel.app/screenshot.png"
+    ],
+    "primaryCategory": "social",
+    "tags": [
+      "base",
+      "miniapp",
+      "onchainkit"
+    ],
+    "webhookUrl": "https://3ee529b223594603a83762249a01504a-kr02.vercel.app/api/webhook"
+  }
+}

@@ -1,0 +1,14 @@
+{
+  "name": "CreatorChain",
+  "description": "CreatorChain is a Base Mini App built with Zara.",
+  "image": "https://dummyimage.com/1200x628/0a0b0d/ffffff.png&text=OG",
+  "external_url": "https://3ee529b2-2359-4603-a837-62249a01504a.vercel.app",
+  "properties": {
+    "app": {
+      "name": "CreatorChain",
+      "description": "CreatorChain is a Base Mini App built with Zara.",
+      "url": "https://3ee529b2-2359-4603-a837-62249a01504a.vercel.app",
+      "icon": "https://0co.to/images/zara-2.png"
+    }
+  }
+}
