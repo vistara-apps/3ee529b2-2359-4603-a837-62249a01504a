@@ -142,9 +142,10 @@ export function DistributeRevenueModal({
           <Button
             onClick={handleSubmit}
             className="flex-1"
-            disabled={isLoading || !numAmount}
+            loading={isLoading}
+            disabled={!numAmount}
           >
-            {isLoading ? 'Processing...' : 'Distribute Revenue'}
+            Distribute Revenue
           </Button>
         </div>
       </div>

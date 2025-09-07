@@ -223,9 +223,10 @@ export function CreateProjectModal({
           <Button
             onClick={handleSubmit}
             className="flex-1"
-            disabled={isLoading || totalPercentage !== 100}
+            loading={isLoading}
+            disabled={totalPercentage !== 100}
           >
-            {isLoading ? 'Creating...' : 'Create Project'}
+            Create Project
           </Button>
         </div>
       </div>

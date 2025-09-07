@@ -12,6 +12,7 @@ import { PayoutHistory } from '@/components/PayoutHistory';
 import { ContributorRow } from '@/components/ContributorRow';
 import { Button } from '@/components/ui/Button';
 import { Toast } from '@/components/ui/Toast';
+import { SkeletonCard, SkeletonStats, SkeletonContributor } from '@/components/ui/Skeleton';
 import { Project, Contributor, CreateProjectData, DistributeRevenueData, Payout } from '@/lib/types';
 import { generateId } from '@/lib/utils';
 import { Plus, Users, DollarSign, BarChart3, ArrowLeft } from 'lucide-react';
@@ -233,25 +234,32 @@ export default function HomePage() {
           <h2 className="text-xl font-semibold text-textPrimary">My Projects</h2>
           <Button
             onClick={() => setIsCreateModalOpen(true)}
-            className="flex items-center space-x-xs"
+            leftIcon={<Plus className="w-4 h-4" />}
+            disabled={isLoading}
           >
-            <Plus className="w-4 h-4" />
-            <span>New Project</span>
+            New Project
           </Button>
         </div>
 
         <div className="space-y-md">
-          {projects.map((project) => (
-            <ProjectCard
-              key={project.projectId}
-              project={project}
-              variant={project.status === 'active' ? 'active' : 'inactive'}
-              onClick={() => {
-                setSelectedProject(project);
-                setCurrentView('project-details');
-              }}
-            />
-          ))}
+          {isLoading ? (
+            <>
+              <SkeletonCard />
+              <SkeletonCard />
+            </>
+          ) : (
+            projects.map((project) => (
+              <ProjectCard
+                key={project.projectId}
+                project={project}
+                variant={project.status === 'active' ? 'active' : 'inactive'}
+                onClick={() => {
+                  setSelectedProject(project);
+                  setCurrentView('project-details');
+                }}
+              />
+            ))
+          )}
         </div>
       </div>
     </div>
@@ -272,10 +280,9 @@ export default function HomePage() {
             variant="outline"
             size="sm"
             onClick={() => setCurrentView('dashboard')}
-            className="flex items-center space-x-xs"
+            leftIcon={<ArrowLeft className="w-4 h-4" />}
           >
-            <ArrowLeft className="w-4 h-4" />
-            <span>Back</span>
+            Back
           </Button>
           <h1 className="text-2xl font-bold text-textPrimary">{selectedProject.projectName}</h1>
         </div>
@@ -300,10 +307,10 @@ export default function HomePage() {
             <h3 className="text-lg font-semibold text-textPrimary">Contributors</h3>
             <Button
               onClick={() => setIsDistributeModalOpen(true)}
-              className="flex items-center space-x-xs"
+              leftIcon={<DollarSign className="w-4 h-4" />}
+              disabled={isLoading}
             >
-              <DollarSign className="w-4 h-4" />
-              <span>Distribute Revenue</span>
+              Distribute Revenue
             </Button>
           </div>
 

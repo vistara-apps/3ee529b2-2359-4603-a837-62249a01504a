@@ -5,8 +5,111 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
 
 @layer base {
+  :root {
+    /* Core Colors */
+    --background: 248 250 252; /* slate-50 */
+    --foreground: 15 23 42; /* slate-900 */
+    
+    /* Brand Colors */
+    --primary: 59 130 246; /* blue-500 */
+    --primary-50: 239 246 255;
+    --primary-100: 219 234 254;
+    --primary-200: 191 219 254;
+    --primary-300: 147 197 253;
+    --primary-400: 96 165 250;
+    --primary-500: 59 130 246;
+    --primary-600: 37 99 235;
+    --primary-700: 29 78 216;
+    --primary-800: 30 64 175;
+    --primary-900: 30 58 138;
+    --primary-950: 23 37 84;
+    
+    --secondary: 16 185 129; /* emerald-500 */
+    --secondary-50: 236 253 245;
+    --secondary-100: 209 250 229;
+    --secondary-200: 167 243 208;
+    --secondary-300: 110 231 183;
+    --secondary-400: 52 211 153;
+    --secondary-500: 16 185 129;
+    --secondary-600: 5 150 105;
+    --secondary-700: 4 120 87;
+    --secondary-800: 6 95 70;
+    --secondary-900: 6 78 59;
+    --secondary-950: 2 44 34;
+    
+    --accent: 168 85 247; /* purple-500 */
+    --accent-50: 250 245 255;
+    --accent-100: 243 232 255;
+    --accent-200: 233 213 255;
+    --accent-300: 196 181 253;
+    --accent-400: 168 85 247;
+    --accent-500: 147 51 234;
+    --accent-600: 126 34 206;
+    --accent-700: 107 33 168;
+    --accent-800: 88 28 135;
+    --accent-900: 74 29 109;
+    --accent-950: 59 7 100;
+    
+    /* Semantic Colors */
+    --muted: 241 245 249; /* slate-100 */
+    --muted-foreground: 100 116 139; /* slate-500 */
+    
+    --destructive: 239 68 68; /* red-500 */
+    --destructive-foreground: 255 255 255;
+    
+    /* Surface Colors */
+    --surface: 255 255 255; /* white */
+    --surface-secondary: 248 250 252; /* slate-50 */
+    
+    /* Text Colors */
+    --textPrimary: 15 23 42; /* slate-900 */
+    --textSecondary: 71 85 105; /* slate-600 */
+    --textTertiary: 148 163 184; /* slate-400 */
+    
+    /* Border & Input */
+    --border: 226 232 240; /* slate-200 */
+    --input: 226 232 240; /* slate-200 */
+    --ring: 59 130 246; /* blue-500 */
+    
+    /* Radius */
+    --radius: 0.5rem;
+    
+    /* Shadows */
+    --shadow-card: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
+    --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+    
+    /* Chart Colors */
+    --chart-1: 59 130 246; /* blue-500 */
+    --chart-2: 16 185 129; /* emerald-500 */
+    --chart-3: 168 85 247; /* purple-500 */
+    --chart-4: 245 158 11; /* amber-500 */
+    --chart-5: 239 68 68; /* red-500 */
+  }
+  
+  .dark {
+    --background: 2 6 23; /* slate-950 */
+    --foreground: 248 250 252; /* slate-50 */
+    
+    --primary: 96 165 250; /* blue-400 */
+    --secondary: 52 211 153; /* emerald-400 */
+    --accent: 196 181 253; /* purple-300 */
+    
+    --muted: 15 23 42; /* slate-900 */
+    --muted-foreground: 148 163 184; /* slate-400 */
+    
+    --surface: 15 23 42; /* slate-900 */
+    --surface-secondary: 30 41 59; /* slate-800 */
+    
+    --textPrimary: 248 250 252; /* slate-50 */
+    --textSecondary: 203 213 225; /* slate-300 */
+    --textTertiary: 148 163 184; /* slate-400 */
+    
+    --border: 30 41 59; /* slate-800 */
+    --input: 30 41 59; /* slate-800 */
+  }
+
   * {
-    @apply border-gray-200;
+    @apply border-border;
   }
   
   body {
@@ -17,15 +120,21 @@
 
 @layer components {
   .frame-container {
-    @apply max-w-lg w-full mx-auto px-4 min-h-screen bg-background;
+    @apply max-w-lg w-full mx-auto px-lg min-h-screen bg-background;
   }
   
   .project-card {
-    @apply bg-surface rounded-lg p-lg shadow-card border border-gray-100 hover:shadow-lg transition-all duration-200;
+    @apply bg-surface rounded-lg p-lg border border-border hover:border-primary/30 transition-all duration-200 cursor-pointer;
+    box-shadow: var(--shadow-card);
+  }
+  
+  .project-card:hover {
+    box-shadow: var(--shadow-lg);
+    @apply transform -translate-y-0.5;
   }
   
   .project-card.active {
-    @apply border-primary/20 bg-primary/5;
+    @apply border-primary/30 bg-primary/5;
   }
   
   .project-card.inactive {
@@ -33,11 +142,11 @@
   }
   
   .contributor-row {
-    @apply flex items-center justify-between p-md bg-surface rounded-md border border-gray-100;
+    @apply flex items-center justify-between p-md bg-surface rounded-md border border-border;
   }
   
   .input-field {
-    @apply w-full px-md py-sm border border-gray-200 rounded-md bg-surface text-textPrimary placeholder-textSecondary focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all duration-200;
+    @apply w-full px-md py-sm border border-input rounded-md bg-surface text-textPrimary placeholder-textSecondary focus:outline-none focus:ring-2 focus:ring-ring/20 focus:border-ring transition-all duration-200;
   }
   
   .input-field.textarea {
@@ -45,46 +154,56 @@
   }
   
   .btn {
-    @apply px-lg py-sm rounded-md font-medium transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2;
+    @apply px-lg py-sm rounded-md font-medium transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 active:scale-95;
   }
   
   .btn-primary {
-    @apply bg-primary text-white hover:bg-primary/90 focus:ring-primary/20;
+    @apply bg-primary text-white hover:bg-primary/90 focus:ring-primary/20 shadow-sm;
   }
   
   .btn-secondary {
-    @apply bg-secondary text-white hover:bg-secondary/90 focus:ring-secondary/20;
+    @apply bg-secondary text-white hover:bg-secondary/90 focus:ring-secondary/20 shadow-sm;
   }
   
   .btn-outline {
-    @apply border border-gray-200 text-textPrimary hover:bg-gray-50 focus:ring-gray-200;
+    @apply border border-border text-textPrimary hover:bg-muted focus:ring-ring/20 shadow-sm;
   }
   
   .btn-destructive {
-    @apply bg-red-500 text-white hover:bg-red-600 focus:ring-red-200;
+    @apply bg-destructive text-destructive-foreground hover:bg-destructive/90 focus:ring-destructive/20 shadow-sm;
   }
   
   .modal-overlay {
-    @apply fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50;
+    @apply fixed inset-0 bg-black/50 flex items-center justify-center p-lg z-50 backdrop-blur-sm;
   }
   
   .modal-content {
-    @apply bg-surface rounded-xl p-xl max-w-md w-full shadow-2xl animate-slide-up;
+    @apply bg-surface rounded-xl p-xl max-w-md w-full shadow-2xl animate-slide-up border border-border;
   }
   
   .toast {
-    @apply fixed top-4 right-4 px-lg py-md rounded-md shadow-lg z-50 animate-fade-in;
+    @apply fixed top-4 right-4 px-lg py-md rounded-md shadow-lg z-50 animate-fade-in border;
   }
   
   .toast.success {
-    @apply bg-green-500 text-white;
+    @apply bg-secondary text-white border-secondary;
   }
   
   .toast.error {
-    @apply bg-red-500 text-white;
+    @apply bg-destructive text-destructive-foreground border-destructive;
   }
   
   .toast.info {
-    @apply bg-blue-500 text-white;
+    @apply bg-primary text-white border-primary;
+  }
+  
+  /* Skeleton loading animation */
+  .skeleton {
+    @apply animate-pulse bg-muted rounded;
+  }
+  
+  /* Improved focus styles */
+  .focus-ring {
+    @apply focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2;
   }
 }
